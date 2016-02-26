@@ -7,6 +7,7 @@
 #include <QString>
 #include <mbedtls/aes.h>
 #include <mbedtls/sha512.h>
+#include <mbedtls/pkcs5.h>
 #include <QFile>
 #include <QFileInfo>
 

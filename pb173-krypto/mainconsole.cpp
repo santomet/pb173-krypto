@@ -19,6 +19,10 @@ void MainConsole::init()
         return;
     }
 
+  //  QFile source(mSource);
+
+
+
 }
 
 bool MainConsole::MainConsole::parseOpts()
@@ -36,7 +40,7 @@ bool MainConsole::MainConsole::parseOpts()
     if(mParser->isSet("hash"))
         mHash = mParser->value("hash");
 
-    if(!(mEncryptBool || mDecryptBool))
+    if(!(mEncryptBool || mDecryptBool) || (mEncryptBool && mDecryptBool))
     {
         qDebug() << "[ERROR] You must set if you want to decrypt or encrypt";
         return false;
