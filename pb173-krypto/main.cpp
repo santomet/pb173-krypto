@@ -15,12 +15,13 @@ int main(int argc, char *argv[])
 
     parser.addPositionalArgument("source", "Source file to hash and encrypt/decrypt and verify");
     parser.addPositionalArgument("dest", "Destination of encrypted/decrypted file");
+    parser.addHelpOption();
 
-    QCommandLineOption decrypt("d", "Decrypt and verify hash");
-    QCommandLineOption encrypt("e", "Encrypt and make hash");
-    QCommandLineOption hash(QStringList() << "h" << "hash", "Destination/Source file of hash or hash itself. If not defined for encryption, it will be writtend on stdout",
-                            "hash");
-    parser.addOptions(QList<QCommandLineOption>() << encrypt << decrypt << hash);
+    QCommandLineOption key(QStringList() << "k" << "key", "Password for encryption/decryption", "password");
+    QCommandLineOption decrypt(QStringList() << "d" << "decrypt", "Decrypt and verify hash");
+    QCommandLineOption encrypt(QStringList() << "e" << "encrypt", "Encrypt and make hash");
+    QCommandLineOption hash(QStringList() << "s" << "hash", "Destination/Source file of hash or hash itself. If not defined for encryption, it will be written on stdout","hash");
+    parser.addOptions(QList<QCommandLineOption>() << encrypt << decrypt << key << hash);
 
     parser.process(a);
 

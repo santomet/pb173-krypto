@@ -39,16 +39,29 @@ bool MainConsole::MainConsole::parseOpts()
 
     if(mParser->isSet("hash"))
         mHash = mParser->value("hash");
+    if(mParser->isSet("key"))
+        mKey = mParser->value("key");
+
 
     if(!(mEncryptBool || mDecryptBool) || (mEncryptBool && mDecryptBool))
     {
-        qDebug() << "[ERROR] You must set if you want to decrypt or encrypt";
+        qDebug() << "[ERROR] You must set if you want to decrypt or encrypt!";
         return false;
+    }
+
+    if(mKey.isEmpty())
+    {
+        qDebug() << "[ERROR] You really need some key for this...";
+    }
+
+    if(mDecryptBool && mHash.isEmpty())
+    {
+        qDebug() << "[ERROR] you must set hash (file or hash itself) for verification";
     }
 
     if(mSource.isEmpty() || mDest.isEmpty())
     {
-        qDebug() << "[ERROR] Source or destination can't be empty";
+        qDebug() << "[ERROR] Source or destination can't be empty, use -h/--help";
         return false;
     }
 
@@ -61,9 +74,9 @@ bool MainConsole::MainConsole::parseOpts()
         return false;
     }
 
-    if(!testDest.isWritable())
+    if(testDest.exists() /* or something else TODO */)
     {
-        qDebug() << "[ERROR] Can't write to this destination";
+        qDebug() << "[ERROR] Can't write to this destination, use -h/--help";
         return false;
     }
 

@@ -10,6 +10,7 @@
 #include <mbedtls/pkcs5.h>
 #include <QFile>
 #include <QFileInfo>
+#include <QDir>
 
 class MainConsole : public QObject
 {
@@ -34,6 +35,7 @@ private:
     QString mDest{""};
     QString mSource{""};
     QString mHash{""};
+    QString mKey{""};
 };
 
 #endif // MAINCONSOLE_H
