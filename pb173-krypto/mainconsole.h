@@ -18,10 +18,12 @@ public:
     ~MainConsole();
 
 
-
 signals:
+    void exitNormal();
+    void exitError();
 
 public slots:
+    void init();
 
 private:
     bool parseOpts();

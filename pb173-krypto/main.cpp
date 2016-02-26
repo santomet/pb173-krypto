@@ -1,6 +1,7 @@
 #include "mainconsole.h"
 #include <QCoreApplication>
 #include <QCommandLineParser>
+#include <QTimer>
 
 int main(int argc, char *argv[])
 {
@@ -24,6 +25,9 @@ int main(int argc, char *argv[])
     parser.process(a);
 
     MainConsole n(&parser);
+    QObject::connect(&n, SIGNAL(exitNormal()), &a, SLOT(quit()));
+
+    QTimer::singleShot(0, &n, SLOT(init()));
 
     return a.exec();
 }

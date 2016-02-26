@@ -3,12 +3,21 @@
 MainConsole::MainConsole(QCommandLineParser *parser, QObject *parent) : QObject(parent), mParser(parser)
 {
 //    qDebug() << "Hello world?";
-    if(!parseOpts())
-        return;
+
 }
 
 MainConsole::~MainConsole()
 {
+
+}
+
+void MainConsole::init()
+{
+    if(!parseOpts())
+    {
+        emit exitNormal();
+        return;
+    }
 
 }
 
