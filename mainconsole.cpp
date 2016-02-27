@@ -19,7 +19,8 @@ void MainConsole::init()
         return;
     }
 
-  //  QFile source(mSource);
+    QFile sourceFile(mSource);
+
 
 
 
