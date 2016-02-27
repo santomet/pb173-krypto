@@ -14,6 +14,7 @@ CONFIG   -= app_bundle
 
 TEMPLATE = app
 
+LIBS += -lQt5Concurrent -lmbedtls -lmbedcrypto
 
 SOURCES += main.cpp \
     mainconsole.cpp
