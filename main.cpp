@@ -17,10 +17,10 @@ int main(int argc, char *argv[])
     parser.addPositionalArgument("dest", "Destination of encrypted/decrypted file");
     parser.addHelpOption();
 
-    QCommandLineOption key(QStringList() << "k" << "key", "Password/key for encryption/decryption. If the lenght is not equal to 32, it will be hashed with SHA256 and then used as key", "password");
+    QCommandLineOption key(QStringList() << "k" << "key", "Password for encryption/decryption. It will be hashed with SHA256 and the digest then used as a key", "password");
     QCommandLineOption decrypt(QStringList() << "d" << "decrypt", "Decrypt and verify hash");
     QCommandLineOption encrypt(QStringList() << "e" << "encrypt", "Encrypt and make hash");
-    QCommandLineOption hash(QStringList() << "s" << "hash", "Destination/Source file of hash or hash itself. If not defined for encryption, it will be written on stdout","hash");
+    QCommandLineOption hash(QStringList() << "s" << "hash", "Hash to verify","hash");
     parser.addOptions(QList<QCommandLineOption>() << encrypt << decrypt << key << hash);
 
     parser.process(a);

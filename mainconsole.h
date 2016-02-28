@@ -35,37 +35,11 @@ public slots:
 
 private:
     bool parseOpts();
-    QVector<QByteArray> &encrypt(QVector<QByteArray> &chunks);
-    QVector<QByteArray> &decrypt(QVector<QByteArray> &chunks);
-    QString hash(QVector<QByteArray> &chunks);
-    QString hash(QString &sToHash, unsigned char *bitstring);
+    QString hash(QByteArray &chunks);
+    QString hash(QString &sToHash, unsigned char *digest);
 
-    static QByteArray encryptChunk(const QByteArray &chunk);
-    static QByteArray decryptChunk(const QByteArray &chunk);
-
-    static void hexify2( unsigned char *obuf, const unsigned char *ibuf, int len )
-    {
-        unsigned char l, h;
-
-        while( len != 0 )
-        {
-            h = *ibuf / 16;
-            l = *ibuf % 16;
-
-            if( h < 10 )
-                *obuf++ = '0' + h;
-            else
-                *obuf++ = 'a' + h - 10;
-
-            if( l < 10 )
-                *obuf++ = '0' + l;
-            else
-                *obuf++ = 'a' + l - 10;
-
-            ++ibuf;
-            len--;
-        }
-    }
+    void encrypt(const QByteArray &toEncrypt, QByteArray &encrypted, const unsigned char *key, size_t originalsize);
+    void decrypt(const QByteArray &toDecrypt, QByteArray &decrypted, const unsigned char *key);
 
     QCommandLineParser *mParser;
     bool mEncryptBool, mDecryptBool;

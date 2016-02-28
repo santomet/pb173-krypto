@@ -26,33 +26,62 @@ void MainConsole::init()
     if(!sourceFile.open(QIODevice::ReadOnly))
     {
         qDebug() << "[Error] can't open a file";
+        exit(1);
     }
 
-    QVector<QByteArray> sByteArray((sourceFile.size()/16));
+    QByteArray sByteArray;
+    QByteArray dByteArray;
 
-    //I know that Vector of ByteArrays is not the most effective way but i just wanted to touch qtConcurrent through this homework...
-    //Yes, i actually hope that mbedTLS is made to be threadsafe
-
-    while(!sourceFile.atEnd())
-    {
-        char *chunkData;
-        qint64 readSize = sourceFile.read(chunkData, 16);
-
-        if(readSize < 16 && readSize > 0)       //PKCS#7 padding
+/*-----------------------------LOAD FILE-----------------------*/
+    sByteArray.append(sourceFile.readAll());
+    qint64 readSize = sByteArray.size();
+    if(mEncryptBool)
+        if(readSize%16 != 0)       //PKCS#7 padding
         {
-            char toPad = (char)(16-readSize);
-            chunkData = (char*)realloc((void*)chunkData, 16);
-            for(int i = readSize-1;i<16;++i)
-                chunkData[i] = (char)toPad;
+            int toPad = (16-(readSize%16));
+            char *padding = (char*)malloc(toPad);
+            for(int i = 0;i<toPad;++i)
+                padding[i] = (char)toPad;
+            sByteArray.append(padding, toPad);
         }
-        sByteArray.append(QByteArray(chunkData,16));
-    }
     sourceFile.close();
 
+    unsigned char key[32];
+    QString usedKeyString = hash(mKey, key);
+    QString controlHash;
+
     if(mEncryptBool)
-        QVector<QByteArray> dByteArray = encrypt(sByteArray);
+    {
+        encrypt(sByteArray, dByteArray, key, sourceFile.size());
+        controlHash = hash(dByteArray);
+    }
     else
-        QVector<QByteArray> dByteArray = decrypt(sByteArray);
+    {
+        controlHash = hash(sByteArray);
+        if(controlHash != mHash)
+        {
+            qDebug() << "[ERROR] Provided fingerprint is not equal to fingerprint of provided file!";
+            exit(0);
+        }
+        decrypt(sByteArray, dByteArray, key);
+    }
+
+    QFile destFile(mDest);
+    if (!destFile.open(QIODevice::WriteOnly))
+    {
+        qDebug() << "[ERROR] could not create file";
+        exit(1);
+    }
+
+    destFile.write(dByteArray);
+
+    destFile.close();
+
+    qDebug() << "Operation successfully finished";
+    if(mEncryptBool)
+        qDebug() << "Hash of encrypted file is " << controlHash;
+    else
+        qDebug() << "fingerprints are equal";
 
 
 
@@ -121,74 +150,74 @@ bool MainConsole::MainConsole::parseOpts()
     return true;
 }
 
-QVector<QByteArray> &MainConsole::encrypt(QVector<QByteArray> &chunks)
-{
-//    QVector<QByteArray> d = QtConcurrent::blockingMapped(chunks, encryptChunk);
-    QVector<QByteArray> d;
-    d.resize(chunks.size());
-    foreach(QByteArray &chunk, chunks)
-    {
-        d.append(encryptChunk(chunk));
-    }
-
-    return d;
-}
-
-QVector<QByteArray> &MainConsole::decrypt(QVector<QByteArray> &chunks)
-{
-//    QVector<QByteArray> d = QtConcurrent::blockingMapped(chunks, decryptChunk);
-
-    QVector<QByteArray> d;
-    d.resize(chunks.size());
-    foreach(QByteArray &chunk, chunks)
-    {
-        d.append(decryptChunk(chunk));
-    }
-
-    return d;
-}
-
-QString MainConsole::hash(QVector<QByteArray> &chunks)
+QString MainConsole::hash(QByteArray &chunks)
 {
     unsigned char digest[64];
     char out[128];
     memset(digest, 0, 64);
     memset(out, 0, 128);
-
-    mbedtls_sha512_context shacon;
-    mbedtls_sha512_init(&shacon);
-    mbedtls_sha512_starts(&shacon, 0);
-
-
-
-
-
-}
-
-QString MainConsole::hash(QString &sToHash, unsigned char *bitstring)
-{
-    unsigned char digest[32];
-    char out[64];
-    memset(out, 0, 64);
-    memset(digest, 0, 32);
-    mbedtls_sha256((const unsigned char*)sToHash.toStdString().c_str(), sToHash.size(), digest, 0);
-    for(int i = 0; i < 32; i++ ) {
-            sprintf(out+i*2, "%02x", digest[i]);
-        }
+    mbedtls_sha512((const unsigned char*)chunks.constData(),chunks.size(), digest, 0);
+    for(int i = 0; i<64; ++i)
+    {
+        sprintf(out+i*2, "%02x", digest[i]);
+    }
     QString qOut(out);
     return qOut;
 }
 
-QByteArray MainConsole::encryptChunk(const QByteArray &chunk)
+QString MainConsole::hash(QString &sToHash, unsigned char *digest)
 {
-    char* fuck = (char*)malloc(16);
-    return QByteArray(fuck,16);
+    char out[64];
+    memset(out, 0, 64);
+    memset(digest, 0, 32);
+    mbedtls_sha256((const unsigned char*)sToHash.toStdString().c_str(), sToHash.size(), digest, 0);
+    for(int i = 0; i < 32; ++i )
+    {
+        sprintf(out+i*2, "%02x", digest[i]);
+    }
+    QString qOut(out);
+    return qOut;
 }
 
-QByteArray MainConsole::decryptChunk(const QByteArray &chunk)
+
+void MainConsole::encrypt(const QByteArray &toEncrypt, QByteArray &encrypted, const unsigned char* key, size_t originalsize)
 {
-    char* fuck = (char*)malloc(16);
-    return QByteArray(fuck,16);
+    unsigned char iv[16];
+    qsrand(QDateTime::currentDateTime().toTime_t());
+    for(int i = 0; i<16; ++i)
+        iv[i] = qrand();
+    encrypted.append((const char*)iv, 16);
+    unsigned char* out;
+    out = (unsigned char*)malloc(toEncrypt.size());
+    memset(out, 0, toEncrypt.size());
+
+    mbedtls_aes_context aescon;
+    mbedtls_aes_setkey_enc(&aescon, key, 256);
+    mbedtls_aes_crypt_cbc(&aescon, MBEDTLS_AES_ENCRYPT, toEncrypt.size(), iv, (const unsigned char*)toEncrypt.constData(), out);
+    encrypted.append((const char*)out, toEncrypt.size());
+    mbedtls_aes_free(&aescon);
+    long unsigned int writesize = originalsize;
+    encrypted.append((const char*)&writesize, sizeof(long unsigned int));
+}
+
+void MainConsole::decrypt(const QByteArray &toDecrypt, QByteArray &decrypted, const unsigned char *key)
+{
+    unsigned char *out;
+
+    size_t originalsize = (size_t)*(toDecrypt.data()+(toDecrypt.size()-sizeof(long unsigned int)));
+
+    unsigned char *iv;
+    iv = (unsigned char*)malloc(16);
+    memcpy(iv, (toDecrypt.data()), 16);
+
+    out = (unsigned char*)malloc(toDecrypt.size()-16-sizeof(long unsigned int));
+    memset(out, 0, originalsize);
+
+    mbedtls_aes_context aescon;
+    mbedtls_aes_setkey_dec(&aescon, key, 256);
+    mbedtls_aes_crypt_cbc(&aescon, MBEDTLS_AES_DECRYPT, (toDecrypt.size()-16-sizeof(long unsigned int)), iv, (const unsigned char*)toDecrypt.data()+16, out);
+    mbedtls_aes_free(&aescon);
+    decrypted.append((char*)out, originalsize);
 }
 
 
