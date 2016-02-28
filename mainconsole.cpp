@@ -197,6 +197,8 @@ void MainConsole::encrypt(const QByteArray &toEncrypt, QByteArray &encrypted, co
     mbedtls_aes_free(&aescon);
     long unsigned int writesize = originalsize;
     encrypted.append((const char*)&writesize, sizeof(long unsigned int));
+
+    free(out);
 }
 
 void MainConsole::decrypt(const QByteArray &toDecrypt, QByteArray &decrypted, const unsigned char *key)
@@ -217,6 +219,8 @@ void MainConsole::decrypt(const QByteArray &toDecrypt, QByteArray &decrypted, co
     mbedtls_aes_crypt_cbc(&aescon, MBEDTLS_AES_DECRYPT, (toDecrypt.size()-16-sizeof(long unsigned int)), iv, (const unsigned char*)toDecrypt.data()+16, out);
     mbedtls_aes_free(&aescon);
     decrypted.append((char*)out, *originalsize);
+    free(iv);
+    free(out);
 }
 
 
