@@ -60,8 +60,12 @@ void MainConsole::init()
         controlHash = hash(sByteArray);
         if(controlHash != mHash)
         {
-            qDebug() << "[ERROR] Provided fingerprint is not equal to fingerprint of provided file!";
-            exit(0);
+            qDebug() << "!!!HASH IS NOT PROVIDED OR NOT EQUAL!!!";
+//            exit(0);
+        }
+        else
+        {
+            qDebug() << "HASHES ARE EQUAL!";
         }
         decrypt(sByteArray, dByteArray, key);
     }
@@ -79,10 +83,10 @@ void MainConsole::init()
 
     qDebug() << "Operation successfully finished";
     if(mEncryptBool)
+    {
         qDebug() << "Hash of encrypted file is " << controlHash;
-    else
-        qDebug() << "fingerprints are equal";
-
+        qDebug() << "SAVE THIS HASH FOR LATER USE!";
+    }
 
 
     exit(0);
@@ -107,7 +111,6 @@ bool MainConsole::MainConsole::parseOpts()
     if(mParser->isSet("key"))
         mKey = mParser->value("key");
 
-
     if(!(mEncryptBool || mDecryptBool) || (mEncryptBool && mDecryptBool))
     {
         qDebug() << "[ERROR] You must set if you want to decrypt or encrypt!";
@@ -119,10 +122,6 @@ bool MainConsole::MainConsole::parseOpts()
         qDebug() << "[ERROR] You really need some key for this...";
     }
 
-    if(mDecryptBool && mHash.isEmpty())
-    {
-        qDebug() << "[ERROR] you must set hash (file or hash itself) for verification";
-    }
 
     if(mSource.isEmpty() || mDest.isEmpty())
     {
@@ -204,20 +203,20 @@ void MainConsole::decrypt(const QByteArray &toDecrypt, QByteArray &decrypted, co
 {
     unsigned char *out;
 
-    size_t originalsize = (size_t)*(toDecrypt.data()+(toDecrypt.size()-sizeof(long unsigned int)));
+    long unsigned int *originalsize = (long unsigned int*)(toDecrypt.data()+(toDecrypt.size()-sizeof(long unsigned int)));
 
     unsigned char *iv;
     iv = (unsigned char*)malloc(16);
     memcpy(iv, (toDecrypt.data()), 16);
 
     out = (unsigned char*)malloc(toDecrypt.size()-16-sizeof(long unsigned int));
-    memset(out, 0, originalsize);
+    memset(out, 0, *originalsize);
 
     mbedtls_aes_context aescon;
     mbedtls_aes_setkey_dec(&aescon, key, 256);
     mbedtls_aes_crypt_cbc(&aescon, MBEDTLS_AES_DECRYPT, (toDecrypt.size()-16-sizeof(long unsigned int)), iv, (const unsigned char*)toDecrypt.data()+16, out);
     mbedtls_aes_free(&aescon);
-    decrypted.append((char*)out, originalsize);
+    decrypted.append((char*)out, *originalsize);
 }
 
 
