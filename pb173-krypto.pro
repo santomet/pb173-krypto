@@ -14,10 +14,13 @@ CONFIG   -= app_bundle
 
 TEMPLATE = app
 
-LIBS += -lQt5Concurrent -lmbedtls -lmbedcrypto
+LIBS += -lmbedtls -lmbedcrypto
 
-SOURCES += main.cpp \
-    mainconsole.cpp
+SOURCES += src/main.cpp \
+    src/mainconsole.cpp
 
 HEADERS += \
-    mainconsole.h
+    src/mainconsole.h
+
+DISTFILES += \
+    .travis.yml
