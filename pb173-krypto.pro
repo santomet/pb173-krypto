@@ -13,7 +13,7 @@ CONFIG   += console
 #CONFIG  += c++11
 CONFIG   -= app_bundle
 
-QMAKE_CXXFLAGS += -std=c++11
+QMAKE_CXXFLAGS += -std=gnu++11
 
 TEMPLATE = app
 
