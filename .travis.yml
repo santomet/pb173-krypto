@@ -1,8 +1,9 @@
 install:
-  - sudo add-apt-repository ppa:kubuntu-ppa/backports -y
+  - sudo add-apt-repository --yes ppa:ubuntu-sdk-team/ppa
   - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
   - sudo apt-get update
-  - sudo apt-get install qtbase-opensource-src
+  - sudo apt-get install qtbase5-dev qtdeclarative5-dev libqt5webkit5-dev libsqlite3-dev
+  - sudo apt-get install qt5-default qttools5-dev-tools
   - sudo apt-get install g++-4.8
   - wget https://tls.mbed.org/download/mbedtls-2.2.1-apache.tgz --no-check-certificate
   - tar xzvf mbedtls-2.2.1-apache.tgz
