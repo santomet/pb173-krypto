@@ -21,7 +21,10 @@ int main(int argc, char *argv[])
     QCommandLineOption decrypt(QStringList() << "d" << "decrypt", "Decrypt and verify hash");
     QCommandLineOption encrypt(QStringList() << "e" << "encrypt", "Encrypt and make hash");
     QCommandLineOption hash(QStringList() << "s" << "hash", "Hash to verify","hash");
-    parser.addOptions(QList<QCommandLineOption>() << encrypt << decrypt << key << hash);
+    parser.addOption(encrypt);
+    parser.addOption(decrypt);
+    parser.addOption(key);
+    parser.addOption(hash);
 
     parser.process(a);
 

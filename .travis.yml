@@ -9,6 +9,5 @@ install:
 
 script:
   - cd ..
-  - qmake -project
   - qmake pb173-krypto.pro
   - make
