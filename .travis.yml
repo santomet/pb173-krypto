@@ -1,6 +1,10 @@
 install:
   - sudo apt-get update
   - sudo apt-get install libqt4-dev qt4-qmake
+  - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+  - sudo apt-get update -qq
+  - if [ "$CXX" = "g++" ]; then sudo apt-get install -qq g++-4.8; fi
+  - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
   - wget https://tls.mbed.org/download/mbedtls-2.2.1-apache.tgz --no-check-certificate
   - tar xzvf mbedtls-2.2.1-apache.tgz
   - cd mbedtls-2.2.1/
