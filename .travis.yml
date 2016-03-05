@@ -14,5 +14,7 @@ install:
 
 script:
   - cd ..
-  - qmake pb173-krypto.pro
+  - qmake pb173-krypto.pro CONFIG+=configMain
+  - make
+  - qmake pb173-krypto.pro CONFIG+=configTest
   - make

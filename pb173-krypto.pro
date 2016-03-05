@@ -8,23 +8,39 @@ QT       += core
 
 QT       -= gui
 
-TARGET = pb173-krypto
 CONFIG   += console
 #CONFIG  += c++11
 CONFIG   -= app_bundle
 
 QMAKE_CXX = g++-4.8
-QMAKE_CXXFLAGS += -std=gnu++11
+QMAKE_CXXFLAGS += -std=c++11
 
 TEMPLATE = app
 
 LIBS += -lmbedtls -lmbedcrypto
 
-SOURCES += src/main.cpp \
-    src/mainconsole.cpp
+SOURCES += \
+    src/mainconsole.cpp \
 
 HEADERS += \
     src/mainconsole.h
 
+
 DISTFILES += \
     .travis.yml
+
+configMain {
+
+TARGET = pb173-krypto
+
+SOURCES += src/main.cpp
+}
+
+configTest {
+
+TARGET = pb173-krypto-test
+
+SOURCES += src/tests.cpp
+
+}
+
