@@ -6,6 +6,7 @@ install:
   - sudo apt-get install qtbase5-dev qtdeclarative5-dev libqt5webkit5-dev libsqlite3-dev
   - sudo apt-get install qt5-default qttools5-dev-tools
   - sudo apt-get install g++-4.8
+  - sudo apt-get install catch
   - wget https://tls.mbed.org/download/mbedtls-2.2.1-apache.tgz --no-check-certificate
   - tar xzvf mbedtls-2.2.1-apache.tgz
   - cd mbedtls-2.2.1/

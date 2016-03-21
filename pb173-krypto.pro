@@ -9,8 +9,8 @@ QT       += core
 QT       -= gui
 
 CONFIG   += console
-#CONFIG  += c++11
 CONFIG   -= app_bundle
+
 
 QMAKE_CXX = g++-4.8
 QMAKE_CXXFLAGS += -std=c++11

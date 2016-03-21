@@ -14,11 +14,12 @@ MainConsole::~MainConsole()
 
 void MainConsole::init()
 {
-    if(!parseOpts())
-    {
-        emit exitNormal();
-        return;
-    }
+    if(mParser != nullptr) //else tester class should set all variables
+        if(!parseOpts())
+        {
+            emit exitNormal();
+            return;
+        }
 
 
     QFile sourceFile(mSource);

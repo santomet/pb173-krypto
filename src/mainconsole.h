@@ -21,6 +21,7 @@
 class MainConsole : public QObject
 {
     Q_OBJECT
+    friend class Test;
 public:
     explicit MainConsole(QCommandLineParser *parser, QObject *parent = 0);
     ~MainConsole();

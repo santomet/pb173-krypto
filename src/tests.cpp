@@ -5,13 +5,32 @@
 //{
 //    Q_OBJECT
 
+//public:
+//    bool runTests();
 
+//private:
+//    MainConsole m;
 //};
+
+
 
 
 
 int main()
 {
-    qDebug () << "fuck yeah hello you fucking world!";
-    return 0;
+//    Test t;
+//    if (!t.runTests())
+//        exit(1);
+    exit(0);
+
 }
+
+
+//bool Test::runTests()
+//{
+//    QVERIFY()
+
+
+
+
+//}
